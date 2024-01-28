@@ -81,6 +81,23 @@ class Tensor:
     out._backward = _backward
     return out
 
+  def relu(self) -> type["Tensor"]:
+    x = self.data 
+    out = Tensor(np.maximum(x, 0), (self,), _op = 'relu')
+    def _backward():
+      self.grad = self.grad + np.where(x >=0, 1, 0) * out.grad
+    out._backward = _backward
+    return out 
+  
+  def sigmoid(self) -> type["Tensor"]:
+    x = self.data
+    sig = 1/(1+np.exp(-self.data))
+    out = Tensor(sig, (self,), _op = "sigmoid")
+    def _backward():
+      self.grad = self.grad + sig*(1-sig)*out.grad
+    out._backward = _backward
+    return out 
+
   def backward(self):
     topo = []
     visited = set()
@@ -95,9 +112,11 @@ class Tensor:
     for node in reversed(topo):
         node._backward()
 
+
   def __repr__(self):
     return f"Value(data={self.data})"
   
   # checks if input is Tensor and converts otherwise
   def checktype(self, other: Union[int, float, np.ndarray, list]) -> type["Tensor"]:
     return other if isinstance(other, Tensor) else Tensor(other)
+  
