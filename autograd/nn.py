@@ -1,7 +1,7 @@
 from engine import Tensor
 from typing import List, Union
 import random
-
+import numpy as np
 class Neuron:
 
   def __init__(self, nin: int, _activation = Tensor.tanh):
@@ -33,15 +33,14 @@ class Layer:
   
 class MLP:
 
-  def __init__(self, nin: int, hidden: int,layers: int, nout: int, _activation= Tensor.tanh):
-    self.layers =  [Layer(nin, hidden)] + [Layer(hidden, hidden) for i in range(layers)] + [Layer(hidden, nout)]
+  def __init__(self, nin,hsize, layers, nouts, _activation = Tensor.tanh):
+    self.layers = [Layer(nin, hsize, _activation)] + [Layer(hsize, hsize, _activation) for layer in range(layers)] + [Layer(hsize, nouts,_activation)]
 
-  def __call__(self, x) -> type[Tensor]:
+  def __call__(self, x):
     for layer in self.layers:
       x = layer(x)
+
     return x
 
-  def parameters(self) -> List[Tensor]:
+  def parameters(self):
     return [p for layer in self.layers for p in layer.parameters()]
-  
-  
