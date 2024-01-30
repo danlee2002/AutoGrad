@@ -49,10 +49,12 @@ class MLP:
 container class for neural networks
 """
 class nn:
-  def __init__(self, containers, loss, lr = 1e-3):
+  def __init__(self, containers, loss, lr = 1e-3, trackLoss = True):
     self.modules = containers 
     self.lr = lr
     self.loss = loss
+    self.trackLoss = trackLoss
+    self.losslist = []
 
   def forward(self, x):
     y = []
@@ -75,8 +77,5 @@ class nn:
   def mse(y_pred,y_true):
    return sum((yout - ygt) ** 2 for ygt, yout in zip(y_true, y_pred))
 
-  def predict(self, x):
-    y_pred = x
-    for module in self.modules:
-      y_pred = module(y_pred)
-    return y_pred
+
+
