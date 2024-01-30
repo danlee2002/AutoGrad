@@ -73,9 +73,12 @@ class nn:
       loss.backward()
       for p in module.parameters():
         p.data += -self.lr * p.grad
+ 
+  def crossentropy(y_pred, y_true):
+    softmax = Tensor.exp(y_pred)/Tensor.exp(y_pred).sum()
+    
+
 
   def mse(y_pred,y_true):
-   return sum((yout - ygt) ** 2 for ygt, yout in zip(y_true, y_pred))
-
-
+   return sum((yout - ygt) ** 2 for ygt, yout in zip(y_true, y_pred))/len(y_pred)
 

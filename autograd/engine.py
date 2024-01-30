@@ -71,7 +71,8 @@ class Tensor:
         self.grad = self.grad + (out.data * out.grad)
     out._backward = _backward
     return out
-
+  def sum(self):
+    ...
   def tanh(self) -> type["Tensor"]:
     x = self.data
     t = np.tanh(x)
@@ -112,6 +113,10 @@ class Tensor:
     for node in reversed(topo):
         node._backward()
 
+
+  # util functions 
+  def sum(self):
+    return self.data.sum()
 
   def __repr__(self):
     return f"Value(data={self.data})"
