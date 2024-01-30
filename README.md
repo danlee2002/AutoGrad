@@ -1,7 +1,7 @@
 # AutoGrad
 Autograd is an automatic differentiation library written with the purpose of simplifying the calculation of deriavtives.
 It aims an api similar to PyTorch and utilizes the Reverse-Mode variant of automatic differentiation.
-At the current moment, it has built in support for FCNN and there are plans to add more advanced architechtures in the future such as CNN and LSTM.
+At the current moment, it has built in support for FCNNs and there are plans to add more advanced architechtures in the future such as CNNs and LSTMs.
 ### Example usage
 ```python
 from autograd.engine import Tensor

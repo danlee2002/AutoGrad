@@ -2,6 +2,7 @@ from engine import Tensor
 from typing import List, Union
 import random
 import numpy as np
+from collections import OrderedDict
 class Neuron:
 
   def __init__(self, nin: int, _activation = Tensor.tanh):
@@ -15,7 +16,6 @@ class Neuron:
   
   def parameters(self):
     return self.w + [self.b]
-
   
 class Layer:
 
@@ -30,7 +30,6 @@ class Layer:
     # Return the parameters of all neurons in the layer
     return [p for neuron in self.neurons for p in neuron.parameters()]
 
-  
 class MLP:
 
   def __init__(self, nin,hsize, layers, nouts, _activation = Tensor.tanh):
@@ -39,8 +38,45 @@ class MLP:
   def __call__(self, x):
     for layer in self.layers:
       x = layer(x)
-
     return x
 
   def parameters(self):
     return [p for layer in self.layers for p in layer.parameters()]
+
+
+
+"""
+container class for neural networks
+"""
+class nn:
+  def __init__(self, containers, loss, lr = 1e-3):
+    self.modules = containers 
+    self.lr = lr
+    self.loss = loss
+
+  def forward(self, x):
+    y = []
+    for x_elem in x:
+      y_pred = x_elem
+      for module in self.modules:
+        y_pred = module(y_pred)
+      y = y + [y_pred]
+    return y
+
+  def backward(self, y_pred, y_true):
+    loss = self.loss(y_pred,y_true)
+    for module in self.modules:
+      for p in module.parameters():
+        p.grad = 0
+      loss.backward()
+      for p in module.parameters():
+        p.data += -self.lr * p.grad
+
+  def mse(y_pred,y_true):
+   return sum((yout - ygt) ** 2 for ygt, yout in zip(y_true, y_pred))
+
+  def predict(self, x):
+    y_pred = x
+    for module in self.modules:
+      y_pred = module(y_pred)
+    return y_pred
