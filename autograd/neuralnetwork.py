@@ -27,7 +27,6 @@ class Layer:
     return outs[0] if len(outs) == 1 else outs
   
   def parameters(self):
-    # Return the parameters of all neurons in the layer
     return [p for neuron in self.neurons for p in neuron.parameters()]
 
 class MLP:
@@ -73,12 +72,27 @@ class nn:
       loss.backward()
       for p in module.parameters():
         p.data += -self.lr * p.grad
- 
+
   def crossentropy(y_pred, y_true):
-    softmax = Tensor.exp(y_pred)/Tensor.exp(y_pred).sum()
-    
+
+      
+      expvalue = [[y_i.exp() for y_i in y] for y in y_pred]
+
+      denom = [sum(y) for y in expvalue]
+      softmax = [[y_i/denomval for y_i in y] for y, denomval in zip(expvalue,denom)]
+      acc = 0
+      for val, y in zip(np.array([[y_i.data for y_i in y_pred] for y_pred in softmax]),y_true):
+        if np.argmax(val) == np.argmax(y):
+          acc+=1.0
+
+      acc = acc/len(y_pred)
+      print(acc)
+
+      
+      crossentropy = -sum([sum([ y_i * (s_i.log()) for s_i,y_i in zip(s,y)]) for s,y in zip(softmax, y_true)])/len(y_pred)
+
+      return crossentropy
 
 
   def mse(y_pred,y_true):
    return sum((yout - ygt) ** 2 for ygt, yout in zip(y_true, y_pred))/len(y_pred)
-

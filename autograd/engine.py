@@ -24,7 +24,7 @@ class Tensor:
 
   def __mul__(self, other: Union[int, float, np.ndarray, list]) -> type["Tensor"]:
     other = self.checktype(other)
-    out = Tensor(self.data * other.data, (self, other), '*')
+    out = Tensor(self.data * other.data, (self, other), _op = '*')
     def _backward():
       self.grad = self.grad + (other.data * out.grad)
       other.grad = other.grad + (self.data * out.grad)
@@ -34,7 +34,7 @@ class Tensor:
   def __pow__(self, other: Union[int, float, np.ndarray, list]) -> type["Tensor"]:
     if isinstance(other, (int, float)):
       out_data = np.power(self.data, other)
-      out = Tensor(out_data, (self,), f'**{other}')
+      out = Tensor(out_data, (self,), _op = f'**{other}')
       def _backward():
         self.grad = self.grad + ((other * np.power(self.data, other - 1)) * out.grad)
 
@@ -42,7 +42,7 @@ class Tensor:
       return out
     else:
       out_data = np.power(self.data, other.data)
-      out = Tensor(out_data, (self, other), f'**')
+      out = Tensor(out_data, (self, other), _op = f'**')
       def _backward():
         self.grad = self.grad + ((other.data * np.power(self.data * other.data - 1)) * out.grad)
         other.grad = other.grad + (np.log(self.data) * out.grad)
@@ -66,7 +66,7 @@ class Tensor:
 
   def exp(self) -> type["Tensor"]:
     x = self.data
-    out = Tensor(np.exp(x), (self, ), 'exp')
+    out = Tensor(np.exp(x), (self, ), _op = 'exp')
     def _backward():
         self.grad = self.grad + (out.data * out.grad)
     out._backward = _backward
@@ -93,11 +93,19 @@ class Tensor:
   def sigmoid(self) -> type["Tensor"]:
     x = self.data
     sig = 1/(1+np.exp(-self.data))
-    out = Tensor(sig, (self,), _op = "sigmoid")
+    out = Tensor(sig, (self,), _op = 'sigmoid')
     def _backward():
       self.grad = self.grad + sig*(1-sig)*out.grad
     out._backward = _backward
     return out 
+
+  def log(self) -> type["Tensor"]:
+    data = np.log(self.data)
+    out = Tensor(data, (self,), _op = 'log')
+    def _backward():
+      self.grad = self.grad + 1/data* out.grad
+    out._backward = _backward
+    return out
 
   def backward(self):
     topo = []
@@ -113,15 +121,17 @@ class Tensor:
     for node in reversed(topo):
         node._backward()
 
-
   # util functions 
-  def sum(self):
+  def sum(self) -> float:
     return self.data.sum()
 
+  def eye(n: int) -> type['Tensor']:
+    return Tensor(np.eye(n))
+  
   def __repr__(self):
     return f"Value(data={self.data})"
   
   # checks if input is Tensor and converts otherwise
   def checktype(self, other: Union[int, float, np.ndarray, list]) -> type["Tensor"]:
     return other if isinstance(other, Tensor) else Tensor(other)
-  
+
