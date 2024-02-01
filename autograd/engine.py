@@ -103,7 +103,7 @@ class Tensor:
     data = np.log(self.data)
     out = Tensor(data, (self,), _op = 'log')
     def _backward():
-      self.grad = self.grad + 1/data* out.grad
+      self.grad = self.grad + np.ones_like(data)/self.data* out.grad
     out._backward = _backward
     return out
 
@@ -134,4 +134,7 @@ class Tensor:
   # checks if input is Tensor and converts otherwise
   def checktype(self, other: Union[int, float, np.ndarray, list]) -> type["Tensor"]:
     return other if isinstance(other, Tensor) else Tensor(other)
-
+  
+x =Tensor([2.0,2.0])
+a = x.log()
+a.backward()
