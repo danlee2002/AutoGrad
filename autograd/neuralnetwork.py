@@ -84,10 +84,17 @@ class nn:
       for val, y in zip(np.array([[y_i.data for y_i in y_pred] for y_pred in softmax]),y_true):
         if np.argmax(val) == np.argmax(y):
           acc+=1.0
-      acc = acc/len(y_pred)      
+
+      acc = acc/len(y_pred)
+      print(acc)
+
+      
       crossentropy = -sum([sum([ y_i * (s_i.log()) for s_i,y_i in zip(s,y)]) for s,y in zip(softmax, y_true)])/len(y_pred)
+      print(crossentropy)
       return crossentropy
 
 
   def mse(y_pred,y_true):
    return sum((yout - ygt) ** 2 for ygt, yout in zip(y_true, y_pred))/len(y_pred)
+  
+
