@@ -3,7 +3,7 @@ Autograd is an automatic differentiation and machine library that aim to provide
 
 # Example Usage Learning halfspace
 ```python
-from autograd import nn
+from autograd.neuralnetwork import nn,MLP
 model = nn([MLP(2,4,10,2)], loss = nn.crossentropy, lr = 0.2)
 
 
