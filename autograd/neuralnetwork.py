@@ -79,6 +79,7 @@ class nn:
         if np.argmax(val) == np.argmax(y):
           acc+=1.0
       acc = acc/len(y_pred)
+      print(acc)
       crossentropy = -sum([sum([ y_i * (s_i.log()) for s_i,y_i in zip(s,y)]) for s,y in zip(softmax, y_true)])/len(y_pred)    
       return crossentropy
 
