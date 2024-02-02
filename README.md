@@ -13,3 +13,5 @@ for i in range(400):
   y_pred = model.forward(xs)
   model.backward(y_pred, ys)
 ```
+
+More sample usage can be found here [Link Text](tests)

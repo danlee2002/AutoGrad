@@ -128,6 +128,10 @@ class Tensor:
   def eye(n: int) -> type['Tensor']:
     return Tensor(np.eye(n))
   
+  def arange(start, stop, step = 1):
+    return Tensor(np.arange(start, stop,step))
+
+
   def __repr__(self):
     return f"Value(data={self.data})"
   
