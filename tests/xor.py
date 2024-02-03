@@ -3,7 +3,6 @@ sys.path.append('../')
 from autograd.neuralnetwork import nn, MLP
 
 def main():
-
     model =nn([MLP(2,5,10,2)], loss = nn.crossentropy, lr = 0.05)
     #sample program to learn xor logic gate
     xs = [[1.0,0.0],[0.0,1.0],[0.0,0.0],[1.0,1.0]]

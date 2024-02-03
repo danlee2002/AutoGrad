@@ -1,8 +1,9 @@
+from __future__ import annotations 
 from autograd.engine import Tensor
 from typing import List, Union
 import random
 import numpy as np
-from collections import OrderedDict
+
 class Neuron:
 
   def __init__(self, nin: int, _activation = Tensor.tanh):
@@ -47,6 +48,7 @@ class nn:
   def __init__(self, containers, loss, lr = 1e-3, trackLoss = True):
     self.modules = containers 
     self.lr = lr
+    self.mode = 'batch'
     self.loss = loss
     self.trackLoss = trackLoss
     self.losslist = []
@@ -60,6 +62,12 @@ class nn:
       y = y + [y_pred]
     return y
   
+
+      
+
+
+
+
   def backward(self, y_pred, y_true):
     loss = self.loss(y_pred,y_true)
     print(loss)
@@ -69,6 +77,8 @@ class nn:
       loss.backward()
       for p in module.parameters():
         p.data += -self.lr * p.grad
+  
+
 
   def crossentropy(y_pred, y_true):
       expvalue = [[y_i.exp() for y_i in y] for y in y_pred]

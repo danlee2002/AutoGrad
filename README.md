@@ -14,4 +14,4 @@ for i in range(400):
   model.backward(y_pred, ys)
 ```
 
-More sample usage can be found[here](tests)
+More sample usage can be found [here](tests)
