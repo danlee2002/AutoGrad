@@ -1,18 +1,17 @@
 from __future__ import annotations 
 from autograd.engine import Tensor
 from typing import List, Union
-import random
 import numpy as np
 
 class Neuron:
-
   def __init__(self, nin: int, _activation = Tensor.tanh):
-    self.w = [Tensor(random.uniform(-1, 1)) for _ in range(nin)]
-    self.b = Tensor(random.uniform(-1,1))
+    self.w = [Tensor(np.random.uniform(-1,1)) for _ in range(nin)]
+    self.b = Tensor(np.random.uniform(-1,1))
     self._activation = _activation
+
   def __call__(self, x):
     act = sum((wi*xi for wi, xi in zip(self.w, x)), self.b)
-    out = act.tanh()
+    out = self._activation(act)
     return out
   
   def parameters(self):
@@ -40,18 +39,38 @@ class MLP:
 
   def parameters(self):
     return [p for layer in self.layers for p in layer.parameters()]
+"""
+To-do:
+implementation convolution neural networks
+"""
+class Convolution2d:
+  def __init__(self, nin):
+    ...
+
+  def maxpool():
+    ...
+
+
+class CNN:
+  def __init__(self, stride = (1,1)):
+    self.stride = stride 
+  def cross_correlation():
+    ...
+
+
 
 """
 container class for neural networks
 """
 class nn:
-  def __init__(self, containers, loss, lr = 1e-3, trackLoss = True):
+  def __init__(self, containers, loss, lr = 1e-3, trackLoss = True, momentum:float = 0.9):
     self.modules = containers 
     self.lr = lr
     self.mode = 'batch'
     self.loss = loss
     self.trackLoss = trackLoss
     self.losslist = []
+    self.momentum = momentum
 
   def forward(self, x):
     y = []
@@ -62,12 +81,6 @@ class nn:
       y = y + [y_pred]
     return y
   
-
-      
-
-
-
-
   def backward(self, y_pred, y_true):
     loss = self.loss(y_pred,y_true)
     print(loss)
@@ -77,8 +90,9 @@ class nn:
       loss.backward()
       for p in module.parameters():
         p.data += -self.lr * p.grad
-  
-
+        
+  def sgd():
+    ...
 
   def crossentropy(y_pred, y_true):
       expvalue = [[y_i.exp() for y_i in y] for y in y_pred]

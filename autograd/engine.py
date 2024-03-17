@@ -1,8 +1,9 @@
 from __future__ import annotations
 import numpy as np
 from typing import Union, Tuple
+
 class Tensor:
-  
+
   def __init__(self, data: Union[int, float, np.ndarray, list], _children:tuple[type[Tensor]]=(), _op='', label='') -> type[Tensor]:
     if isinstance(data, np.ndarray):
       self.data = data
@@ -140,6 +141,4 @@ class Tensor:
   def checktype(self, other: Union[int, float, np.ndarray, list]) -> type[Tensor]:
     return other if isinstance(other, Tensor) else Tensor(other)
   
-x =Tensor([2.0,2.0])
-a = x.log()
-a.backward()
+
