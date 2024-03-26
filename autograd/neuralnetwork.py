@@ -21,7 +21,7 @@ class Layer:
   def __init__(self, nin: int, nout: int, _activation =  Tensor.tanh):
     self.neurons = [Neuron(nin, _activation = _activation) for _ in range(nout)]
   
-  def __call__(self, x) -> Union[List[type[Tensor]],type[Tensor]]:
+  def __call__(self, x) -> Union[List[Tensor],Tensor]:
     outs = [n(x) for n in self.neurons]
     return outs[0] if len(outs) == 1 else outs
   

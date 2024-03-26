@@ -4,7 +4,7 @@ from typing import Union, Tuple
 
 class Tensor:
 
-  def __init__(self, data: Union[int, float, np.ndarray, list], _children:tuple[type[Tensor]]=(), _op='', label='') -> type[Tensor]:
+  def __init__(self, data: Union[int, float, np.ndarray, list], _children:tuple[Tensor]=(), _op='', label='') -> Tensor:
     if isinstance(data, np.ndarray):
       self.data = data
     else:
@@ -24,7 +24,7 @@ class Tensor:
     out._backward = _backward
     return out
 
-  def __mul__(self, other: Union[int, float, np.ndarray, list]) -> type["Tensor"]:
+  def __mul__(self, other: Union[int, float, np.ndarray, list]) -> Tensor:
     other = self.checktype(other)
     out = Tensor(self.data * other.data, (self, other), _op = '*')
     def _backward():
@@ -33,7 +33,7 @@ class Tensor:
     out._backward = _backward
     return out
 
-  def __pow__(self, other: Union[int, float, np.ndarray, list]) -> type[Tensor]:
+  def __pow__(self, other: Union[int, float, np.ndarray, list]) -> Tensor:
     if isinstance(other, (int, float)):
       out_data = np.power(self.data, other)
       out = Tensor(out_data, (self,), _op = f'**{other}')
@@ -51,10 +51,10 @@ class Tensor:
       out._backward = _backward
       return out
  
-  def __radd__(self, other: Union[int, float, np.ndarray, list]) -> type[Tensor]:
+  def __radd__(self, other: Union[int, float, np.ndarray, list]) -> Tensor:
     return self + other
 
-  def __rmul__(self, other: Union[int, float, np.ndarray, list]) -> type[Tensor]:
+  def __rmul__(self, other: Union[int, float, np.ndarray, list]) -> Tensor:
     return self * other
 
   def __truediv__(self, other: Union[int, float, np.ndarray, list]) -> type[Tensor]:
@@ -75,7 +75,7 @@ class Tensor:
     return out
   def sum(self):
     ...
-  def tanh(self) -> type["Tensor"]:
+  def tanh(self) -> Tensor:
     x = self.data
     t = np.tanh(x)
     out = Tensor(t, (self, ), 'tanh')
@@ -84,7 +84,7 @@ class Tensor:
     out._backward = _backward
     return out
 
-  def relu(self) -> type["Tensor"]:
+  def relu(self) -> Tensor:
     x = self.data 
     out = Tensor(np.maximum(x, 0), (self,), _op = 'relu')
     def _backward():
@@ -92,7 +92,7 @@ class Tensor:
     out._backward = _backward
     return out 
   
-  def sigmoid(self) -> type["Tensor"]:
+  def sigmoid(self) -> Tensor:
     x = self.data
     sig = 1/(1+np.exp(-self.data))
     out = Tensor(sig, (self,), _op = 'sigmoid')
@@ -101,7 +101,7 @@ class Tensor:
     out._backward = _backward
     return out 
 
-  def log(self) -> type[Tensor]:
+  def log(self) -> Tensor:
     data = np.log(self.data)
     out = Tensor(data, (self,), _op = 'log')
     def _backward():
@@ -127,7 +127,7 @@ class Tensor:
   def sum(self) -> float:
     return self.data.sum()
 
-  def eye(n: int) -> type[Tensor]:
+  def eye(n: int) -> Tensor:
     return Tensor(np.eye(n))
   
   def arange(start, stop, step = 1):
@@ -138,7 +138,7 @@ class Tensor:
     return f"Value(data={self.data})"
   
   # checks if input is Tensor and converts otherwise
-  def checktype(self, other: Union[int, float, np.ndarray, list]) -> type[Tensor]:
+  def checktype(self, other: Union[int, float, np.ndarray, list]) -> Tensor:
     return other if isinstance(other, Tensor) else Tensor(other)
   
 
