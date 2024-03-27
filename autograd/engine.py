@@ -4,7 +4,7 @@ from typing import Union, Tuple
 
 class Tensor:
 
-  def __init__(self, data: Union[int, float, np.ndarray, list], _children:tuple[Tensor]=(), _op='', label='') -> Tensor:
+  def __init__(self, data: Union[int, float, np.ndarray, list], _children:tuple[Tensor]=(), _op='', label='', _requiresgrad:bool = True) -> Tensor:
     if isinstance(data, np.ndarray):
       self.data = data
     else:
@@ -14,6 +14,7 @@ class Tensor:
     self._prev = set(_children)
     self._op = _op
     self.label = label
+    self.requires_grad = _requiresgrad
 
   def __add__(self, other: Union[int, float, np.ndarray, list]) -> Tensor:
     other = self.checktype(other)
