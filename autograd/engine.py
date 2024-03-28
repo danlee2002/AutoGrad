@@ -1,10 +1,10 @@
 from __future__ import annotations
 import numpy as np
-from typing import Union, Tuple
+from typing import Union
 
 class Tensor:
 
-  def __init__(self, data: Union[int, float, np.ndarray, list], _children:tuple[Tensor]=(), _op='', label='', _requiresgrad:bool = True) -> Tensor:
+  def __init__(self, data: Union[int, float, np.ndarray, list], _children:tuple[Tensor]=(), _op='', label='',dtype = np.float64, _requiresgrad:bool = True) -> Tensor:
     if isinstance(data, np.ndarray):
       self.data = data
     else:
@@ -14,42 +14,42 @@ class Tensor:
     self._prev = set(_children)
     self._op = _op
     self.label = label
-    self.requires_grad = _requiresgrad
+    self._requiresgrad = _requiresgrad
 
   def __add__(self, other: Union[int, float, np.ndarray, list]) -> Tensor:
     other = self.checktype(other)
-    out = Tensor(self.data + other.data, (self, other), '+')
+    out = Tensor(self.data + other.data, (self, other) if self._requiresgrad else (), '+')
+
     def _backward():
       self.grad = self.grad + (1.0 * out.grad)
       other.grad = other.grad + (1.0 * out.grad)
-    out._backward = _backward
+    if self._requiresgrad: out._backward = _backward
     return out
 
   def __mul__(self, other: Union[int, float, np.ndarray, list]) -> Tensor:
     other = self.checktype(other)
-    out = Tensor(self.data * other.data, (self, other), _op = '*')
+    out = Tensor(self.data * other.data, (self, other) if self._requiresgrad else (), _op = '*')
     def _backward():
       self.grad = self.grad + (other.data * out.grad)
       other.grad = other.grad + (self.data * out.grad)
-    out._backward = _backward
+    if self._requiresgrad: out._backward = _backward
     return out
 
   def __pow__(self, other: Union[int, float, np.ndarray, list]) -> Tensor:
     if isinstance(other, (int, float)):
       out_data = np.power(self.data, other)
-      out = Tensor(out_data, (self,), _op = f'**{other}')
+      out = Tensor(out_data, (self,) if self._requiresgrad else(), _op = f'**{other}')
       def _backward():
         self.grad = self.grad + ((other * np.power(self.data, other - 1)) * out.grad)
-
-      out._backward = _backward
+      if self._requiresgrad: out._backward = _backward
       return out
     else:
       out_data = np.power(self.data, other.data)
-      out = Tensor(out_data, (self, other), _op = f'**')
+      out = Tensor(out_data, (self, other) if self._requiresgrad else (), _op = f'**')
       def _backward():
         self.grad = self.grad + ((other.data * np.power(self.data * other.data - 1)) * out.grad)
         other.grad = other.grad + (np.log(self.data) * out.grad)
-      out._backward = _backward
+      if self._requiresgrad: out._backward = _backward 
       return out
  
   def __radd__(self, other: Union[int, float, np.ndarray, list]) -> Tensor:
@@ -69,45 +69,43 @@ class Tensor:
 
   def exp(self) -> type[Tensor]:
     x = self.data
-    out = Tensor(np.exp(x), (self, ), _op = 'exp')
+    out = Tensor(np.exp(x), (self, ) if self._requiresgrad else (), _op = 'exp')
     def _backward():
         self.grad = self.grad + (out.data * out.grad)
-    out._backward = _backward
+    if self._requiresgrad: out._backward = _backward
     return out
-  def sum(self):
-    ...
+
   def tanh(self) -> Tensor:
     x = self.data
     t = np.tanh(x)
-    out = Tensor(t, (self, ), 'tanh')
+    out = Tensor(t, (self, ) if self._requiresgrad else (), 'tanh')
     def _backward():
         self.grad = self.grad + ((1 - t**2) * out.grad)
-    out._backward = _backward
+    if self._requiresgrad: out._backward = _backward
     return out
 
   def relu(self) -> Tensor:
     x = self.data 
-    out = Tensor(np.maximum(x, 0), (self,), _op = 'relu')
+    out = Tensor(np.maximum(x, 0), (self,) if self._requiresgrad else (), _op = 'relu')
     def _backward():
       self.grad = self.grad + np.where(x >=0, 1, 0) * out.grad
-    out._backward = _backward
+    if self._requiresgrad: out._backward = _backward
     return out 
   
   def sigmoid(self) -> Tensor:
-    x = self.data
     sig = 1/(1+np.exp(-self.data))
-    out = Tensor(sig, (self,), _op = 'sigmoid')
+    out = Tensor(sig, (self,) if self._requiresgrad else (), _op = 'sigmoid')
     def _backward():
       self.grad = self.grad + sig*(1-sig)*out.grad
-    out._backward = _backward
+    if self._requiresgrad: out._backward = _backward
     return out 
 
   def log(self) -> Tensor:
     data = np.log(self.data)
-    out = Tensor(data, (self,), _op = 'log')
+    out = Tensor(data, (self,) if self._requiresgrad else (), _op = 'log')
     def _backward():
       self.grad = self.grad + np.ones_like(data)/self.data* out.grad
-    out._backward = _backward
+    if self._requiresgrad: out._backward = _backward
     return out
 
   def backward(self):
