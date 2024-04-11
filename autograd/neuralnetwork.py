@@ -57,8 +57,6 @@ class CNN:
   def cross_correlation():
     ...
 
-
-
 """
 container class for neural networks
 """
@@ -89,7 +87,7 @@ class nn:
         p.grad = 0
       loss.backward()
       for p in module.parameters():
-        p.data += -self.lr * p.grad
+        p.data -= self.lr * p.grad
         
   def sgd():
     ...
